@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os 
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,13 +93,18 @@ WSGI_APPLICATION = 'mykazana.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+import dj_database_url
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        'postgresql://mykazana_user:Bn4WJsalkpqSDvsNr7XwTWSzTEQzwJVc@dpg-cvndjamuk2gs73cs95bg-a.oregon-postgres.render.com/mykazana',
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
+
+
+
 
 
 # Password validation
