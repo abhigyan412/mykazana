@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-6((2w7aod32urnhw)f))8xp43us8n7_9i&4jt^4et@jive#-m&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mykazana.onrender.com']
+ALLOWED_HOSTS = ['mykazana.onrender.com' , '127.0.0.1']
 
 
 # Application definition
@@ -45,12 +45,14 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_extensions',
     "corsheaders",
+    'django_filters',
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -96,11 +98,10 @@ WSGI_APPLICATION = 'mykazana.wsgi.application'
 import dj_database_url
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        'postgresql://mykazana_user:Bn4WJsalkpqSDvsNr7XwTWSzTEQzwJVc@dpg-cvndjamuk2gs73cs95bg-a.oregon-postgres.render.com/mykazana',
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

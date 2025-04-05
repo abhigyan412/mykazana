@@ -1,24 +1,36 @@
 from rest_framework import viewsets, permissions, filters
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.permissions import AllowAny
+from django_filters.rest_framework import DjangoFilterBackend  
 from .models import Document
 from .serializers import DocumentSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+
+class ProtectedCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"detail": "Token valid"}, status=200)
 
 class LoginViewSet(TokenObtainPairView):
-    permission_classes = [AllowAny]  # Allow any user to log in
+    permission_classes = [AllowAny]  
 
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser , JSONParser)
     permission_classes = [permissions.IsAuthenticated]
-    
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['file', 'extracted_text']
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]  
+    filterset_fields = ['category']  
+    search_fields = ['file', 'extracted_text']  
     ordering_fields = ['uploaded_at', 'confidence_score']
 
     def get_queryset(self):
@@ -28,7 +40,7 @@ class DocumentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Associate the uploaded document with the logged-in user."""
         serializer.save(user=self.request.user)
-    
+
     def update(self, request, *args, **kwargs):
         """Allow users to manually override the document category."""
         instance = self.get_object()
@@ -43,10 +55,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
         try:
             document = self.get_object()
             new_category = request.data.get("category")
-            
+
             if new_category not in dict(Document.CATEGORY_CHOICES):
                 return Response({"error": "Invalid category"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             document.category = new_category
             document.save()
             return Response({"message": "Category updated successfully", "category": document.category}, status=status.HTTP_200_OK)
