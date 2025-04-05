@@ -5,4 +5,4 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = '__all__'
-        read_only_fields = ['extracted_text', 'category', 'confidence_score', 'uploaded_at', 'user']
+        read_only_fields = ['extracted_text', 'confidence_score', 'uploaded_at', 'user']
